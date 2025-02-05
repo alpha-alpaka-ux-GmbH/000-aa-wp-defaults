@@ -15,9 +15,9 @@ if (!defined('ABSPATH')) {
 
 require plugin_dir_path(__FILE__) . 'functions.php';
 
-// as this is an MU-Plugin, this will never be called
-register_activation_hook(__FILE__, 'aaDefaultActivation');
-register_deactivation_hook(__FILE__, 'aaDefaultDeactivation');
+// // as this is an MU-Plugin, this will never be called
+// register_activation_hook(__FILE__, 'handleMUPluginActivation');
+// register_deactivation_hook(__FILE__, 'handleMUPluginDeactivation');
 
 // Example usage to get the cache-clearing URL elsewhere in the code
 add_action('wp_footer', function () {
