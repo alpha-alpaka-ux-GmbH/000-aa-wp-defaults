@@ -70,17 +70,18 @@ add_filter('pings_open', '__return_false', 20, 2);
 add_action('after_setup_theme', function () {
 
     // WordPress Version 5.9.0 or less:
-    remove_action('wp_enqueue_scripts', 'wp_enqueue_global_styles');
     remove_action('wp_footer', 'wp_enqueue_global_styles', 1);
 
     // WordPress Version 5.9.1 and above:
-    remove_action('wp_enqueue_scripts', 'wp_enqueue_global_styles');
     remove_action('wp_body_open', 'wp_global_styles_render_svg_filters');
 
     // Remove render_block filters and duotones
     remove_filter('render_block', 'wp_render_duotone_support');
     remove_filter('render_block', 'wp_restore_group_inner_container');
     remove_filter('render_block', 'wp_render_layout_support_flag');
+
+    // The following line removes the Gutenberg-Styles and CSS-Selectors that are responsible for inline-stlyes like has-text-color or has-link-color
+    // remove_action('wp_enqueue_scripts', 'wp_enqueue_global_styles');
 });
 
 
