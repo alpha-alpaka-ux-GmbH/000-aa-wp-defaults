@@ -22,7 +22,7 @@ The features are grouped into the following categories / files:
 ## Installation
 
 1. Clone or download this repo into the mu-plugins folder
-2. Activate the plugin through the WordPress admin interface under the Plugins section.
+2. Activate the plugin through the WordPress admin interface under the Plugins section
 
 OR
 
