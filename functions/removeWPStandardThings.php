@@ -91,7 +91,7 @@ add_action('after_setup_theme', function () {
 
 add_action('wp_enqueue_scripts', function () {
     // Removes the global styles defined via theme.json from WP-Head, @link https://developer.wordpress.org/reference/functions/wp_enqueue_global_styles/
-    wp_dequeue_style('global-styles');
+    // wp_dequeue_style('global-styles');
 
     // Handles the enqueueing of block scripts and styles that are common to both the editor and the front-end.
     // @link https://developer.wordpress.org/reference/functions/wp_common_block_scripts_and_styles/
