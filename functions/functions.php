@@ -109,3 +109,40 @@ function getEuro($oldPrice)
     $newPrice = $formatter->format($oldPrice);
     return $newPrice;
 }
+
+
+/**
+ * Add WP Search Disable Option to General Settings
+ */
+add_filter('admin_init', function () {
+    add_settings_field(
+        'disable_wp_search',
+        'Disable WP Search',
+        function () {
+            $enabled = get_option('disable_wp_search', false);
+?>
+        <input type="checkbox" name="disable_wp_search" value="1" <?php checked($enabled, 1); ?> />
+        <label for="disable_wp_search">Disable WordPress search</label>
+<?php
+        },
+        'general'
+    );
+    register_setting('general', 'disable_wp_search', [
+        'type' => 'boolean',
+        'sanitize_callback' => function ($value) {
+            return $value ? 1 : 0;
+        },
+        'default' => 0,
+    ]);
+});
+
+if (get_option('disable_wp_search', false)) {
+    add_action('parse_query', function ($query) {
+        if ($query->is_search) {
+            $query->is_search = false;
+            $query->is_404 = true;
+        }
+    });
+
+    add_filter('get_search_form', '__return_empty_string');
+}
