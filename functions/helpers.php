@@ -25,10 +25,9 @@ function disablePlugins($pluginsToDisable)
 
 if (defined('DEV_DISABLED_PLUGINS')) {
     add_action('admin_init', function () {
-        disablePlugins(unserialize('DEV_DISABLED_PLUGINS'));
+        disablePlugins(\unserialize(constant('DEV_DISABLED_PLUGINS')));
     });
 }
-
 
 /**
  * PHP Logger
