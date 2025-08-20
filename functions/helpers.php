@@ -14,7 +14,6 @@ function disablePlugins($pluginsToDisable)
         return;
     }
 
-
     if (function_exists('is_plugin_active') && function_exists('deactivate_plugins')) {
         foreach ($pluginsToDisable as $pluginToDisable) {
             if (is_plugin_active($pluginToDisable)) {
@@ -22,6 +21,12 @@ function disablePlugins($pluginsToDisable)
             }
         }
     }
+}
+
+if (defined(\DEV_DISABLED_PLUGINS)) {
+    add_action('admin_init', function () {
+        disablePlugins(\unserialize(\DEV_DISABLED_PLUGINS));
+    });
 }
 
 
