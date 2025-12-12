@@ -108,6 +108,10 @@ add_action('wp_enqueue_scripts', function () {
     wp_dequeue_style('storefront-gutenberg-blocks');
 }, 100);
 
+/** 
+ * Disable loading separate core block assets
+ */
+add_filter('should_load_separate_core_block_assets', '__return_false', 100);
 
 /**
  * Deque Footer Scripts
