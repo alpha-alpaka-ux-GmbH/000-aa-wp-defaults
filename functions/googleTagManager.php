@@ -11,7 +11,7 @@ use function Env\env;
 add_action(
     'init',
     function () {
-        if (env('WP_ENV') === 'development' && !\is_user_logged_in()) :
+        if (env('WP_ENV') === 'production' && !\is_user_logged_in()) :
             if ((env('UC_SETTINGS_ID') && env('UC_SETTINGS_ID') !== '')):
                 add_action('wp_head', function () {
 ?>
