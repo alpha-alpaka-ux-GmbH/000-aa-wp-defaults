@@ -1,0 +1,17 @@
+.uc-embed .uc-checkbox input {
+    display: inline-block;
+    padding: 1rem;
+}
+
+.uc-embed div[data-testid="uc-embed-service"] {
+    padding: 1rem;
+}
+
+.uc-embed div[data-testid="uc-embed-service"]:first-of-type {
+    margin-top: 0;
+}
+
+.uc-embed h4,
+.uc-embed .uc-embed-subelement {
+    padding: 1rem;
+}
