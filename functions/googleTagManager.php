@@ -134,7 +134,7 @@ endif;
             j.src =
                 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
             f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', "{{ env('GTM_PROPERTY_ID') }}");
+        })(window, document, 'script', 'dataLayer', "<?php echo env('GTM_PROPERTY_ID'); ?>");
     </script>
             <?php
         endif;
