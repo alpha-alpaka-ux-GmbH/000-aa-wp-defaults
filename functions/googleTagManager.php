@@ -8,55 +8,54 @@ namespace AlphaAlpaka\Defaults;
 
 if (env('WP_ENV') === 'production' && !is_user_logged_in()) :
     if((env('UC_SETTINGS_ID') && env('UC_SETTINGS_ID') !== '')):
-add_action('wp_head', function(){
+        add_action('wp_head', function(){
     ?>
-        {{-- <!-- User Centrics Cookie Consent - only in Production --> --}}
-    <link rel='dns-prefetch' href='https://privacy-proxy.usercentrics.eu' />
-    <link rel='preconnect' href='//app.usercentrics.eu' />
-    <link rel='preconnect' href='//api.usercentrics.eu' />
-    <link rel='preconnect' href='//privacy-proxy.usercentrics.eu' />
-    <link rel='preload' href='//app.usercentrics.eu/browser-ui/latest/loader.js' as='script' />
-    <link rel='preload' href='//privacy-proxy.usercentrics.eu/latest/uc-block.bundle.js' as='script' />
-    <script id='usercentrics-cmp' data-settings-id="<? echo env('UC_SETTINGS_ID'); ?>"
-        src='https://app.usercentrics.eu/browser-ui/latest/loader.js' data-tcf-enabled></script>
-    <script type='application/javascript' src='https://privacy-proxy.usercentrics.eu/latest/uc-block.bundle.js'></script>
-    <?
+            <link rel='dns-prefetch' href='https://privacy-proxy.usercentrics.eu' />
+            <link rel='preconnect' href='//app.usercentrics.eu' />
+            <link rel='preconnect' href='//api.usercentrics.eu' />
+            <link rel='preconnect' href='//privacy-proxy.usercentrics.eu' />
+            <link rel='preload' href='//app.usercentrics.eu/browser-ui/latest/loader.js' as='script' />
+            <link rel='preload' href='//privacy-proxy.usercentrics.eu/latest/uc-block.bundle.js' as='script' />
+            <script id='usercentrics-cmp' data-settings-id="<? echo env('UC_SETTINGS_ID'); ?>" src='https://app.usercentrics.eu/browser-ui/latest/loader.js' data-tcf-enabled></script>
+            <script type='application/javascript' src='https://privacy-proxy.usercentrics.eu/latest/uc-block.bundle.js'></script>
+    <?php
+        }, 1);
+    ?>
 
+
+    <?php
     add_action('wp_footer', function () {
-    ?>
-    <script type="application/javascript">
-    document.addEventListener('DOMContentLoaded', async () => {
+        ?>
+        <script type="application/javascript">
+            document.addEventListener('DOMContentLoaded', async () => {
 
-        /**
-         * UC Banner
-         */
+                /**
+                 * UC Banner
+                 */
 
-        var elementsWithin = document.querySelectorAll('.js__trigger_uc a');
-        var elementsWithClass = document.querySelectorAll('a.js__trigger_uc');
-        var elementsWithHash = document.querySelectorAll('a[href*="#js__trigger_uc"]');
+                var elementsWithin = document.querySelectorAll('.js__trigger_uc a');
+                var elementsWithClass = document.querySelectorAll('a.js__trigger_uc');
+                var elementsWithHash = document.querySelectorAll('a[href*="#js__trigger_uc"]');
 
-        var ucTriggers = Array.from(elementsWithin).concat(Array.from(elementsWithClass)).concat(Array.from(elementsWithHash));
+                var ucTriggers = Array.from(elementsWithin).concat(Array.from(elementsWithClass)).concat(Array.from(elementsWithHash));
 
-        if (ucTriggers) {
-            ucTriggers.forEach(function (element) {
-                element.addEventListener('click', function (e) {
-                    // console.log('trigger uc-banner')
-                    e.preventDefault();
+                if (ucTriggers) {
+                    ucTriggers.forEach(function (element) {
+                        element.addEventListener('click', function (e) {
+                            // console.log('trigger uc-banner')
+                            e.preventDefault();
 
-                    if (typeof UC_UI !== 'undefined' && UC_UI) {
-                        UC_UI.showSecondLayer()
-                    } else {
-                        // console.log('UC Banner not loaded')
-                    }
-                });
+                            if (typeof UC_UI !== 'undefined' && UC_UI) {
+                                UC_UI.showSecondLayer()
+                            } else {
+                                // console.log('UC Banner not loaded')
+                            }
+                        });
+                    });
+                }
             });
-        }
-    });
-    </script>
-    <?
-
-    echo '
-    <style>
+        </script>
+        <style>
         .uc-embed {
             .uc-checkbox {
                 input {
@@ -81,25 +80,25 @@ add_action('wp_head', function(){
                 @apply p-4;
             }
         }
-    </style>
-    ';
-
-
-    if (is_page()) {
-        $page = get_queried_object();
-        if ($page->post_title == 'Datenschutz' || $page->post_title == 'Impressum') {
-?>
-            <script type="application/javascript">
-                var UC_UI_SUPPRESS_CMP_DISPLAY = true;
-            </script>
-<?php
+        </style>
+        <?
+        if (is_page()) {
+            $page = get_queried_object();
+            if ($page->post_title == 'Datenschutz' || $page->post_title == 'Impressum') {
+        ?>
+                <script type="application/javascript">
+                    var UC_UI_SUPPRESS_CMP_DISPLAY = true;
+                </script>
+        <?php
+            }
         }
-    }
+    }, 100);
 endif;
 
 
-        if ((env('GTM_PROPERTY_ID') && env('GTM_PROPERTY_ID') !== '')):
-            ?>
+if ((env('GTM_PROPERTY_ID') && env('GTM_PROPERTY_ID') !== '')):
+    add_action('wp_head', function(){
+    ?>
     <script>
         // create dataLayer
         window.dataLayer = window.dataLayer || [];
@@ -136,9 +135,19 @@ endif;
             f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', "<?php echo env('GTM_PROPERTY_ID'); ?>");
     </script>
-            <?php
-        endif;
-});
+<?php
+    }, 1);
+
+    add_action('wp_body_open', function(){
+    ?>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=<?php echo env('GTM_PROPERTY_ID'); ?>" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <?php
+    }, 1);
+endif;
 
 
 
