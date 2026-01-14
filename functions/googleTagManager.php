@@ -21,7 +21,7 @@ add_action(
                 <link rel='preconnect' href='//privacy-proxy.usercentrics.eu' />
                 <link rel='preload' href='//app.usercentrics.eu/browser-ui/latest/loader.js' as='script' />
                 <link rel='preload' href='//privacy-proxy.usercentrics.eu/latest/uc-block.bundle.js' as='script' />
-                <script id='usercentrics-cmp' data-settings-id="<? echo env('UC_SETTINGS_ID'); ?>" src='https://app.usercentrics.eu/browser-ui/latest/loader.js' data-tcf-enabled></script>
+                <script id='usercentrics-cmp' data-settings-id="<?php echo env('UC_SETTINGS_ID'); ?>" src='https://app.usercentrics.eu/browser-ui/latest/loader.js' data-tcf-enabled></script>
                 <script type='application/javascript' src='https://privacy-proxy.usercentrics.eu/latest/uc-block.bundle.js'></script>
             <?php
                 }, 1);
