@@ -28,13 +28,19 @@ function aa_init_usercentrics()
     // Scripts enqueuen
     add_action('wp_enqueue_scripts', function () {
         // Usercentrics Scripts
-        wp_enqueue_script(
-            'usercentrics-cmp',
-            'https://app.usercentrics.eu/browser-ui/latest/loader.js',
-            [],
-            null,
-            true
-        );
+        // Enqueue the script in a way that adds data-settings-id attribute
+        $uc_settings_id = esc_attr(env('UC_SETTINGS_ID'));
+        $handle = 'usercentrics-cmp';
+        $src = 'https://app.usercentrics.eu/browser-ui/latest/loader.js';
+
+        // Print Usercentrics scripts directly in the head
+        add_action('wp_head', function () {
+            $settings_id = esc_attr(env('UC_SETTINGS_ID'));
+?>
+            <script id='usercentrics-cmp' data-settings-id="<?php echo $settings_id; ?>" src='https://app.usercentrics.eu/browser-ui/latest/loader.js' data-tcf-enabled></script>
+            <script type='application/javascript' src='https://privacy-proxy.usercentrics.eu/latest/uc-block.bundle.js'></script>
+<?php
+        }, 2);
 
         wp_enqueue_script(
             'usercentrics-block',
