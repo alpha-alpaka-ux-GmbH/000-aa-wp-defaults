@@ -67,7 +67,7 @@ class CacheSettings
     /**
      * Clears the WP Rocket Cache if the required functions are available.
      *
-     * @return void
+     * @return bool True if the cache was cleared, false if WP Rocket is unavailable.
      */
     public static function clearWPRocketCache()
     {
@@ -75,11 +75,53 @@ class CacheSettings
             !function_exists('rocket_clean_domain') ||
             !function_exists('rocket_clean_minify')
         ) {
-            return;
+            return false;
         }
 
         rocket_clean_domain();
         rocket_clean_minify();
+
+        return true;
+    }
+
+    /**
+     * Clears the compiled Blade views.
+     *
+     * They survive a deploy, so without this the previously compiled version keeps
+     * being rendered and template changes only show up much later.
+     *
+     * @return int Number of deleted files.
+     */
+    public static function clearCompiledViews()
+    {
+        $compiled = null;
+
+        // Acorn knows its own path - do not guess it here.
+        if (function_exists('Roots\\app')) {
+            try {
+                $compiled = \Roots\app('config')->get('view.compiled');
+            } catch (\Throwable $e) {
+                $compiled = null;
+            }
+        }
+
+        if (!is_string($compiled) || $compiled === '') {
+            $compiled = WP_CONTENT_DIR . '/cache/acorn/framework/views';
+        }
+
+        if (!is_dir($compiled)) {
+            return 0;
+        }
+
+        $cleared = 0;
+
+        foreach (glob(rtrim($compiled, '/') . '/*.php') ?: [] as $file) {
+            if (@unlink($file)) {
+                $cleared++;
+            }
+        }
+
+        return $cleared;
     }
 
     /**
@@ -94,7 +136,21 @@ class CacheSettings
             isset($_GET[self::CLEAR_CACHE_PARAMETER]) &&
             sanitize_text_field($_GET[self::CLEAR_CACHE_PARAMETER]) === self::CLEAR_CACHE_KEY
         ) {
-            self::clearWPRocketCache();
+            self::clearCompiledViews();
+
+            if (self::clearWPRocketCache()) {
+                return;
+            }
+
+            // Auf Staging/Dev ist WP Rocket absichtlich deaktiviert - nur auf Production
+            // ist ein wirkungsloser Purge ein Fehler, den der Deploy sehen muss.
+            if (env('WP_ENV') === 'production') {
+                wp_die(
+                    'Cache clear failed: WP Rocket functions are unavailable.',
+                    'Cache clear failed',
+                    ['response' => 500]
+                );
+            }
         }
     }
 }
