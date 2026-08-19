@@ -85,6 +85,46 @@ class CacheSettings
     }
 
     /**
+     * Clears the compiled Blade views.
+     *
+     * They survive a deploy, so without this the previously compiled version keeps
+     * being rendered and template changes only show up much later.
+     *
+     * @return int Number of deleted files.
+     */
+    public static function clearCompiledViews()
+    {
+        $compiled = null;
+
+        // Acorn knows its own path - do not guess it here.
+        if (function_exists('Roots\\app')) {
+            try {
+                $compiled = \Roots\app('config')->get('view.compiled');
+            } catch (\Throwable $e) {
+                $compiled = null;
+            }
+        }
+
+        if (!is_string($compiled) || $compiled === '') {
+            $compiled = WP_CONTENT_DIR . '/cache/acorn/framework/views';
+        }
+
+        if (!is_dir($compiled)) {
+            return 0;
+        }
+
+        $cleared = 0;
+
+        foreach (glob(rtrim($compiled, '/') . '/*.php') ?: [] as $file) {
+            if (@unlink($file)) {
+                $cleared++;
+            }
+        }
+
+        return $cleared;
+    }
+
+    /**
      * Checks the URL parameter to clear WP Rocket Cache and triggers cache clearing.
      *
      * @return void
@@ -96,6 +136,8 @@ class CacheSettings
             isset($_GET[self::CLEAR_CACHE_PARAMETER]) &&
             sanitize_text_field($_GET[self::CLEAR_CACHE_PARAMETER]) === self::CLEAR_CACHE_KEY
         ) {
+            self::clearCompiledViews();
+
             if (self::clearWPRocketCache()) {
                 return;
             }
