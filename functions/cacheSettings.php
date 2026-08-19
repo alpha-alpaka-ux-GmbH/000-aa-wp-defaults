@@ -67,7 +67,7 @@ class CacheSettings
     /**
      * Clears the WP Rocket Cache if the required functions are available.
      *
-     * @return void
+     * @return bool True if the cache was cleared, false if WP Rocket is unavailable.
      */
     public static function clearWPRocketCache()
     {
@@ -75,11 +75,13 @@ class CacheSettings
             !function_exists('rocket_clean_domain') ||
             !function_exists('rocket_clean_minify')
         ) {
-            return;
+            return false;
         }
 
         rocket_clean_domain();
         rocket_clean_minify();
+
+        return true;
     }
 
     /**
@@ -94,7 +96,19 @@ class CacheSettings
             isset($_GET[self::CLEAR_CACHE_PARAMETER]) &&
             sanitize_text_field($_GET[self::CLEAR_CACHE_PARAMETER]) === self::CLEAR_CACHE_KEY
         ) {
-            self::clearWPRocketCache();
+            if (self::clearWPRocketCache()) {
+                return;
+            }
+
+            // Auf Staging/Dev ist WP Rocket absichtlich deaktiviert - nur auf Production
+            // ist ein wirkungsloser Purge ein Fehler, den der Deploy sehen muss.
+            if (env('WP_ENV') === 'production') {
+                wp_die(
+                    'Cache clear failed: WP Rocket functions are unavailable.',
+                    'Cache clear failed',
+                    ['response' => 500]
+                );
+            }
         }
     }
 }
