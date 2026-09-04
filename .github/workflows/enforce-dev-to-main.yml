@@ -1,0 +1,42 @@
+name: pr-source-branch-check
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    branches: [ main ]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  check-and-close:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify source branch is development
+        id: verify
+        run: |
+          echo "PR head branch = '${{ github.head_ref }}'"
+          if [ "${{ github.head_ref }}" = "development" ]; then
+            echo "allowed=true" >> $GITHUB_OUTPUT
+          else
+            echo "allowed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment and close PR (only when not allowed)
+        if: steps.verify.outputs.allowed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const body = "Dieser Pull Request wurde automatisch geschlossen: Merges nach `main` sind nur aus dem Branch `development` erlaubt. Bitte erstelle den PR von `development`.";
+            await github.rest.issues.createComment({
+              owner, repo, issue_number: pr.number,
+              body
+            });
+            await github.rest.pulls.update({ owner, repo, pull_number: pr.number, state: 'closed' });
+
+      - name: Fail check when not allowed
+        if: steps.verify.outputs.allowed == 'false'
+        run: exit 1
