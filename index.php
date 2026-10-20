@@ -18,8 +18,3 @@ require plugin_dir_path(__FILE__) . 'functions.php';
 // // as this is an MU-Plugin, this will never be called
 // register_activation_hook(__FILE__, 'handleMUPluginActivation');
 // register_deactivation_hook(__FILE__, 'handleMUPluginDeactivation');
-
-// Example usage to get the cache-clearing URL elsewhere in the code
-add_action('wp_footer', function () {
-    echo '<!-- Clear Cache URL: ' . CacheSettings::getClearCacheURL() . ' -->';
-});
