@@ -30,7 +30,7 @@ OR
 
 ## Configuration
 
-- `CLEAR_CACHE_KEY` (`.env` on production and staging): key for the cache clear endpoint the deploy calls (`/?clearcache=<key>`), e.g. generated with `openssl rand -hex 32`. Without it, or with a wrong key, the endpoint answers with 403.
+- `CLEAR_CACHE_KEY` (`.env` on production and staging): key for the cache clear endpoint the deploy calls (`/?clearcache=<key>`), e.g. generated with `openssl rand -hex 32`. Without it, the old built-in key keeps working. That key is public, so set your own on every site. A wrong key is answered with 403.
 
 ## Requirements
 
