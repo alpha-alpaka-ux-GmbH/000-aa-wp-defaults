@@ -15,6 +15,10 @@ class CacheSettings
     // Constants for cache-clearing parameters
     private const CLEAR_CACHE_PARAMETER = 'clearcache';
 
+    // Alter, öffentlich bekannter Key - gilt nur, solange die .env keinen CLEAR_CACHE_KEY
+    // setzt, damit bestehende Deploys nicht brechen.
+    private const FALLBACK_CLEAR_CACHE_KEY = 'qwd12e12r23f23f';
+
     /**
      * Initializes the cache settings
      */
@@ -111,12 +115,12 @@ class CacheSettings
         // Check if the custom parameter exists and matches the key
         if (isset($_GET[self::CLEAR_CACHE_PARAMETER])) {
             // Der Key gehört in die .env - dieses Repo ist öffentlich.
-            $key = env('CLEAR_CACHE_KEY');
+            $key = env('CLEAR_CACHE_KEY') ?: self::FALLBACK_CLEAR_CACHE_KEY;
             $given = wp_unslash($_GET[self::CLEAR_CACHE_PARAMETER]);
 
             // 403 statt still weiterrendern, sonst merkt ein Deploy mit altem Key nicht,
-            // dass nichts geleert wurde. Leerer Key darf nie passen (hash_equals('', '')).
-            if (!is_string($key) || $key === '' || !is_string($given) || !hash_equals($key, $given)) {
+            // dass nichts geleert wurde.
+            if (!is_string($key) || !is_string($given) || !hash_equals($key, $given)) {
                 wp_die('Cache clear denied.', 'Forbidden', ['response' => 403]);
             }
 
