@@ -28,6 +28,10 @@ OR
 
 1. Use it as git-submodule in your project
 
+## Configuration
+
+- `CLEAR_CACHE_KEY` (`.env` on production and staging): key for the cache clear endpoint the deploy calls (`/?clearcache=<key>`), e.g. generated with `openssl rand -hex 32`. Without it, or with a wrong key, the endpoint answers with 403.
+
 ## Requirements
 
 - PHP 7.4 or higher

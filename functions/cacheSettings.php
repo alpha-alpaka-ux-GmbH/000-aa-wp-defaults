@@ -14,27 +14,15 @@ class CacheSettings
 {
     // Constants for cache-clearing parameters
     private const CLEAR_CACHE_PARAMETER = 'clearcache';
-    private const CLEAR_CACHE_KEY = 'qwd12e12r23f23f';
-
-    // Static property for the cache-clearing URL
-    private static $clearCacheURL;
 
     /**
-     * Initializes the static properties
+     * Initializes the cache settings
      */
     public static function initialize()
     {
         // disables caching on development and staging envs (if WP_CACHE is not already defined)
         if (env('WP_ENV') !== 'production' && !defined('WP_CACHE')) {
             define('WP_CACHE', false);
-        }
-
-        // set cache clearing URL
-        if (!isset(self::$clearCacheURL)) {
-            $cacheQuery = http_build_query([
-                self::CLEAR_CACHE_PARAMETER => self::CLEAR_CACHE_KEY,
-            ]);
-            self::$clearCacheURL = esc_url(get_home_url() . '?' . $cacheQuery);
         }
     }
 
@@ -51,17 +39,6 @@ class CacheSettings
         );
 
         disablePlugins($pluginsToDisable);
-    }
-
-    /**
-     * Gets the cache-clearing URL.
-     *
-     * @return string Cache-clearing URL.
-     */
-    public static function getClearCacheURL()
-    {
-        self::initialize(); // Ensure the URL is initialized
-        return self::$clearCacheURL;
     }
 
     /**
@@ -132,10 +109,17 @@ class CacheSettings
     public static function addURLToPurgeCache()
     {
         // Check if the custom parameter exists and matches the key
-        if (
-            isset($_GET[self::CLEAR_CACHE_PARAMETER]) &&
-            sanitize_text_field($_GET[self::CLEAR_CACHE_PARAMETER]) === self::CLEAR_CACHE_KEY
-        ) {
+        if (isset($_GET[self::CLEAR_CACHE_PARAMETER])) {
+            // Der Key gehört in die .env - dieses Repo ist öffentlich.
+            $key = env('CLEAR_CACHE_KEY');
+            $given = wp_unslash($_GET[self::CLEAR_CACHE_PARAMETER]);
+
+            // 403 statt still weiterrendern, sonst merkt ein Deploy mit altem Key nicht,
+            // dass nichts geleert wurde. Leerer Key darf nie passen (hash_equals('', '')).
+            if (!is_string($key) || $key === '' || !is_string($given) || !hash_equals($key, $given)) {
+                wp_die('Cache clear denied.', 'Forbidden', ['response' => 403]);
+            }
+
             self::clearCompiledViews();
 
             if (self::clearWPRocketCache()) {
