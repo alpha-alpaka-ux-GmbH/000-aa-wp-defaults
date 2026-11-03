@@ -126,6 +126,10 @@ class CacheSettings
 
             self::clearCompiledViews();
 
+            // Ein persistenter Object Cache (z. B. Redis) überlebt sonst den Deploy. Vor dem
+            // Rocket-Purge, damit das Preload schon mit frischen Daten rendert.
+            wp_cache_flush();
+
             if (self::clearWPRocketCache()) {
                 return;
             }

@@ -31,6 +31,7 @@ OR
 ## Configuration
 
 - `CLEAR_CACHE_KEY` (`.env` on production and staging): key for the cache clear endpoint the deploy calls (`/?clearcache=<key>`), e.g. generated with `openssl rand -hex 32`. Without it, the old built-in key keeps working. That key is public, so set your own on every site. A wrong key is answered with 403.
+- `WP_REDIS_SELECTIVE_FLUSH` (only with Redis Object Cache): the cache clear endpoint also flushes the object cache, which Redis Object Cache does with `FLUSHDB` on the whole Redis database by default. If several sites share one database, set `WP_REDIS_SELECTIVE_FLUSH` together with a unique `WP_REDIS_PREFIX` per site, otherwise every deploy also empties the other sites' caches.
 
 ## Requirements
 
